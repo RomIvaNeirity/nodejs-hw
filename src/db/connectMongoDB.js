@@ -11,4 +11,3 @@ export const connectMongoDB = async () => {
     process.exit(1); // аварійне завершення програми
   }
 };
-console.log('DB:', mongoose.connection.name);
