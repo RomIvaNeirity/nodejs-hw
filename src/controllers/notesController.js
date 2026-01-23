@@ -5,9 +5,29 @@ import { Note } from '../models/note.js';
 
 // Отримати список усіх нотаток
 export const getAllNotes = async (req, res) => {
-  const notes = await Note.find();
+  const { page = 1, perPage = 10, tag, search } = req.query;
+  const skip = (page - 1) * perPage;
 
-  res.status(200).json(notes);
+  const notesQuery = Note.find();
+
+  // Текстовий пошук
+  if (search) {
+    notesQuery.where({ $text: { $search: search } });
+  }
+
+  // Фільтр за тегом
+  if (tag) {
+    notesQuery.where('tag').equals(tag);
+  }
+
+  const [totalItems, notes] = await Promise.all([
+    notesQuery.clone().countDocuments(),
+    notesQuery.skip(skip).limit(perPage),
+  ]);
+
+  const totalPages = Math.ceil(totalItems / perPage);
+
+  res.status(200).json({ page, perPage, totalItems, totalPages, notes });
 };
 
 // Отримати одну нотатку за id
