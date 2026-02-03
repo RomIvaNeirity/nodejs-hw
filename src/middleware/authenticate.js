@@ -20,7 +20,7 @@ export const authenticate = async (req, res, next) => {
   }
 
   const isSessionTokenExpired =
-    new Date() > new Date(session.accsessTokenValidUntil);
+    new Date() > new Date(session.accessTokenValidUntil);
   if (isSessionTokenExpired) {
     next(createHttpError(401, 'Access token expired'));
     return;
@@ -28,7 +28,7 @@ export const authenticate = async (req, res, next) => {
 
   const user = await User.findById(session.userId);
   if (!user) {
-    next(createHttpError(401, 'User not found'));
+    next(createHttpError(401));
     return;
   }
 
